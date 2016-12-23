@@ -46,7 +46,7 @@ export class Field {
   }
 
   getRawField() {
-    return this.cols;
+    return this.area;
   }
 
   clearRow(y) {

@@ -162,14 +162,16 @@ export class Tetris {
     });
 
     this.engine.setKeyEvent("81", "up", () => {
-      if (this.engine.inAction) {
-        this.engine.stop();
-        this.engine.showOverlay('PAUSE');
-        this.stats.stopTimer();
-      } else {
-        this.engine.start();
-        this.engine.hideOverlay();
-        this.stats.startTimer();
+      if (!this.loss) {
+        if (this.engine.inAction) {
+          this.engine.stop();
+          this.engine.showOverlay('PAUSE');
+          this.stats.stopTimer();
+        } else {
+          this.engine.start();
+          this.engine.hideOverlay();
+          this.stats.startTimer();
+        }
       }
     });
 
@@ -182,10 +184,13 @@ export class Tetris {
   }
 
   reset() {
-    this.engine.hideOverlay();
     this.score = 0;
     this.stats.reset();
     this.activeFigure.fall();
+    this.newFig();
     this.field.clear();
+    this.loss = false;
+    this.engine.start();
+    this.engine.hideOverlay();
   }
 }

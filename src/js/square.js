@@ -15,13 +15,15 @@ export class Square {
   onOutOfField;
 
   draw() {
-    if (this.y >= 0 && this.y < this.field.getRowsCount())
+    if (this.y >= 0 && this.y < this.field.getRowsCount()) {
       this.field.get(this.x, this.y).color(this.color);
+    }
   }
 
   clear() {
-    if (this.y >= 0 && this.y < this.field.getRowsCount())
+    if (this.y >= 0 && this.y < this.field.getRowsCount()) {
       this.field.get(this.x, this.y).off();
+    }
   }
 
   fix() {
