@@ -4,7 +4,8 @@
   "description": "tetris with mutable blocks",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev-server": "webpack-dev-server"
   },
   "author": "Nikolay Ryabov",
   "license": "ISC",
@@ -20,7 +21,8 @@
     "node-sass": "^4.1.1",
     "sass-loader": "^4.1.1",
     "style-loader": "^0.13.1",
-    "webpack": "^1.14.0"
+    "webpack": "^1.14.0",
+    "webpack-dev-server": "^1.16.2"
   },
   "dependencies": {
     "tinycolor2": "^1.4.1"
