@@ -2,171 +2,163 @@ import './../styles/index.scss';
 
 import tinycolor from 'tinycolor2';
 
-var Engine = (function Engine(canvas) {
-  var objectsForDelete = [],
-    downKeys = [],
-    objects = [],
-    startFrameTime,
-    frameDeltaTime,
-    GObj,
-    canvas,
-    frame = function () {
-    },
-    intervalID,
-    inAction = false,
-    keyEvents = {},
-    timeout = 1000 / 50;
 
-  document.addEventListener('keydown', function (event) {
-    var key = getKeyCode(event);
-    if (!(key in downKeys))
-      downKeys[key] = true;
-    if (keyEvents.hasOwnProperty(key) && keyEvents[key].hasOwnProperty("down"))
-      keyEvents[key]["down"].fn.call(keyEvents[key]["down"].context);
-  }.bind(this));
-  document.addEventListener('keyup', function (event) {
-    var key = getKeyCode(event);
-    if (key in downKeys)
-      delete downKeys[key];
-    if (keyEvents.hasOwnProperty(key) && keyEvents[key].hasOwnProperty("up"))
-      keyEvents[key]["up"].fn.call(keyEvents[key]["up"].context);
-  }.bind(this));
-
-
-  function getTime() {
-    var date = new Date();
-    return date.getMilliseconds() + date.getSeconds() * 1000;
-  }
-
-  function GObj(color, x, y, width, height) {
+class GObj {
+  constructor(color, x, y, width, height) {
     this.color = color;
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
   }
-  ;
-  GObj.prototype = {
-    draw: function (context) {
-      context.fillStyle = this.color;
-      context.fillRect(this.x, this.y, this.width, this.height);
-    }
-  };
 
-  function getKeyCode(event) {
-    var keycode;
-    if (!event)
-      var event = window.event;
-    if (event.keyCode) {
-      getKeyCode = function (event) {
-        if (!event)
-          var event = window.event;
-        return event.keyCode;
+  color = '#FFFFFF';
+  x = 0;
+  y = 0;
+  width = 0;
+  height = 0;
+
+  draw(context) {
+    context.fillStyle = this.color;
+    context.fillRect(this.x, this.y, this.width, this.height);
+  }
+}
+
+
+class Engine {
+  constuctor(canvas) {
+    this.canvas = canvas;
+
+    document.addEventListener('keydown', (event) => checkKeyEvent(event, 'down'));
+    document.addEventListener('keyup', (event) => checkKeyEvent(event, 'up'));
+
+    function checkKeyEvent(event, direction) {
+      let key = this.getKeyCode(event);
+
+      if (key in this.downKeys) {
+        delete this.downKeys[key];
       }
+
+      if (this.keyEvents.hasOwnProperty(key) && this.keyEvents[key].hasOwnProperty(direction)) {
+        this.keyEvents[key][direction].fn.call(this.keyEvents[key][direction].context);
+      }
+    }
+  }
+
+  objectsForDelete = [];
+  downKeys = [];
+  objects = [];
+  startFrameTime;
+  frameDeltaTime;
+  GObj;
+  canvas;
+  frame = function () {
+  };
+  intervalID;
+  inAction = false;
+  keyEvents = {};
+  timeout = 1000 / 50;
+
+  getTime() {
+    var date = new Date();
+    return date.getMilliseconds() + date.getSeconds() * 1000;
+  }
+
+
+  getKeyCode(event) {
+    let keycode;
+
+    if (!event) {
+      event = window.event;
+    }
+
+    if (event.keyCode != null) {
       keycode = event.keyCode;// IE
-    } else if (event.which) {
-      getKeyCode = function (event) {
-        if (!event)
-          var event = window.event;
-        return event.which; // all browsers
-      }
+    } else if (event.which != null) {
       keycode = event.which;
     }
+
     return keycode;
   }
 
-  function setFrameFunc(fn) {
-    frame = fn;
+  setFrameFunc(fn) {
+    this.frame = fn;
   }
 
-  function setKeyEvent(key, event, fn, context) {
-    if (!keyEvents.hasOwnProperty(key))
-      keyEvents[key] = {};
-    keyEvents[key][event] = {fn: fn, context: context};
+  setKeyEvent(key, event, fn, context) {
+    if (!this.keyEvents.hasOwnProperty(key))
+      this.keyEvents[key] = {};
+    this.keyEvents[key][event] = {fn: fn, context: context};
   }
 
-  function setCanvas(cnv) {
-    canvas = cnv.getContext('2d');
+  setCanvas(cnv) {
+    this.canvas = cnv.getContext('2d');
     this.width = cnv.width;
     this.height = cnv.height;
   }
 
-  function setTimeout(ms) {
+  setTimeout(ms) {
     this.timeout = ms;
   }
 
-  function getPressKeys() {
-    return downKeys;
+  getPressKeys() {
+    return this.downKeys.slice();
   }
 
-  function createObj(color, x, y, width, height) {
-    var obj = new GObj(color, x, y, width, height)
-    objects.push(obj);
+  createObj(color, x, y, width, height) {
+    var obj = new GObj(color, x, y, width, height);
+    this.objects.push(obj);
     return obj;
   }
 
-  function deleteObj(obj) {
-    objectsForDelete.push(obj);
+  deleteObj(obj) {
+    this.objectsForDelete.push(obj);
   }
 
-  function start() {
-    inAction = true;
-    intervalID = setInterval(function () {
-      var delObjCount = objectsForDelete.length,
-        now = getTime();
-      if (!inAction) {
-        clearInterval(intervalID);
+  start() {
+    this.inAction = true;
+    this.intervalID = setInterval(() => {
+      var delObjCount = this.objectsForDelete.length,
+        now = this.getTime();
+      if (!this.inAction) {
+        clearInterval(this.intervalID);
       } else {
-        for (var key in downKeys)
-          if (downKeys.hasOwnProperty(key))
-            if (keyEvents.hasOwnProperty(key)) {
-              if (keyEvents[key].hasOwnProperty("press"))
-                keyEvents[key]["press"].fn.call(keyEvents[key]["press"].context);
+        for (var key in this.downKeys)
+          if (this.downKeys.hasOwnProperty(key))
+            if (this.keyEvents.hasOwnProperty(key)) {
+              if (this.keyEvents[key].hasOwnProperty("press"))
+                this.keyEvents[key]["press"].fn.call(this.keyEvents[key]["press"].context);
             }
         while (delObjCount--) {
-          objects.splice(objects.indexOf(objectsForDelete[delObjCount]), 1);
-          objectsForDelete.pop();
+          this.objects.splice(this.objects.indexOf(this.objectsForDelete[delObjCount]), 1);
+          this.objectsForDelete.pop();
         }
-        frameDeltaTime = now - startFrameTime;
-        startFrameTime = now;
+        this.frameDeltaTime = now - this.startFrameTime;
+        this.startFrameTime = now;
         clear();
-        if (!frame(frameDeltaTime))
-          inAction = false;
+        if (!this.frame(this.frameDeltaTime))
+          this.inAction = false;
 
         drawAll();
       }
-    }.bind(this), timeout);
+    }, timeout);
   }
 
-  function stop() {
-    inAction = false;
+  stop() {
+    this.inAction = false;
   }
 
-  function drawAll() {
-    var i = objects.length;
+  drawAll() {
+    var i = this.objects.length;
     while (i--) {
-      objects[i].draw(canvas);
+      this.objects[i].draw(this.canvas);
     }
   }
 
-  function clear() {
-    canvas.clearRect(0, 0, this.width, this.height);
+  clear() {
+    this.canvas.clearRect(0, 0, this.width, this.height);
   }
-
-  return {
-    setCanvas: setCanvas,
-    setTimeout: setTimeout,
-    setFrameFunc: setFrameFunc,
-    setKeyEvent: setKeyEvent,
-    frame: setFrameFunc,
-    createObj: createObj,
-    deleteObj: deleteObj,
-    start: start,
-    stop: stop,
-    drawAll: drawAll,
-    objects: objects
-  };
-}());
+}
 
 
 var Tetris = function Tetris(eng) {
@@ -609,9 +601,10 @@ var Tetris = function Tetris(eng) {
 };
 
 window.addEventListener('load', function () {
-  Engine.setCanvas(document.getElementById("glass"));
-  const tetris = new Tetris(Engine);
-  Engine.start();
+  const engine = new Engine(document.getElementById("glass"));
+  const tetris = new Tetris(engine);
+
+  engine.start();
 });
 
 
