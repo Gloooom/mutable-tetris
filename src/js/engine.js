@@ -40,8 +40,6 @@ export class Engine {
 
     document.addEventListener('keydown', (event) => checkKeyEvent(event, 'down'));
     document.addEventListener('keyup', (event) => checkKeyEvent(event, 'up'));
-
-    window.eng = this;
   }
 
   width = 0;
@@ -57,7 +55,42 @@ export class Engine {
   inAction = false;
   keyEvents = {};
   timeout = 1000 / 50;
+  
+  overlay = document.getElementById('overlay');
+  overlayText = document.getElementById('overlay-text');
 
+  frameFunction = () => {
+    let delObjCount = this.objectsForDelete.length,
+      now = this.getTime();
+
+    if (!this.inAction) {
+      clearInterval(this.intervalID);
+    } else {
+      for (let key in this.downKeys) {
+        if (this.downKeys.hasOwnProperty(key)
+          && this.keyEvents.hasOwnProperty(key)
+          && this.keyEvents[key].hasOwnProperty("press")) {
+          this.keyEvents[key]["press"]();
+        }
+      }
+
+      while (delObjCount--) {
+        this.objects.splice(this.objects.indexOf(this.objectsForDelete[delObjCount]), 1);
+        this.objectsForDelete.pop();
+      }
+
+      this.frameDeltaTime = now - this.startFrameTime;
+      this.startFrameTime = now;
+      this.clear();
+
+      if (!this.frame(this.frameDeltaTime)) {
+        this.inAction = false;
+      }
+
+      this.drawAll();
+    }
+  };
+  
   getTime() {
     let date = new Date();
     return date.getMilliseconds() + date.getSeconds() * 1000;
@@ -120,37 +153,7 @@ export class Engine {
   start() {
     this.inAction = true;
 
-    this.intervalID = setInterval(() => {
-      let delObjCount = this.objectsForDelete.length,
-        now = this.getTime();
-
-      if (!this.inAction) {
-        clearInterval(this.intervalID);
-      } else {
-        for (let key in this.downKeys) {
-          if (this.downKeys.hasOwnProperty(key)
-            && this.keyEvents.hasOwnProperty(key)
-            && this.keyEvents[key].hasOwnProperty("press")) {
-            this.keyEvents[key]["press"]();
-          }
-        }
-
-        while (delObjCount--) {
-          this.objects.splice(this.objects.indexOf(this.objectsForDelete[delObjCount]), 1);
-          this.objectsForDelete.pop();
-        }
-
-        this.frameDeltaTime = now - this.startFrameTime;
-        this.startFrameTime = now;
-        this.clear();
-
-        if (!this.frame(this.frameDeltaTime)) {
-          this.inAction = false;
-        }
-
-        this.drawAll();
-      }
-    }, this.timeout);
+    this.intervalID = setInterval(this.frameFunction, this.timeout);
   }
 
   stop() {
@@ -167,5 +170,14 @@ export class Engine {
 
   clear() {
     this.canvas.clearRect(0, 0, this.width, this.height);
+  }
+  
+  showOverlay(text) {
+    this.overlay.classList.remove('hidden');
+    this.overlayText.innerHTML = text;
+  }
+  
+  hideOverlay() {
+    this.overlay.classList.add('hidden');
   }
 }

@@ -209,7 +209,6 @@ export class Figure {
   }
 
   move(x, y) {
-    console.log("move", x, y);
     if (this.checkWay(x, y)) {
       for (let i = this.sqCount; i--;) {
         this.squares[i].x += x;

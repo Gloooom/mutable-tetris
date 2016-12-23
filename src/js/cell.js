@@ -1,6 +1,5 @@
 export class Cell {
   constructor(x, y, cellSize, creator) {
-    this.state = false;
     this.obj = creator("#FFF",
       x * cellSize,
       y * cellSize,
@@ -9,12 +8,19 @@ export class Cell {
     );
   }
 
+  state = false;
+
   invert() {
     this.state = !this.state;
   }
 
   off() {
-    this.obj.color = "#FFF";
+    this.color("#FFF");
+  }
+
+  clear() {
+    this.off();
+    this.state = false;
   }
 
   color(color) {

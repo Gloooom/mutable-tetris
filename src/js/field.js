@@ -1,8 +1,8 @@
 import {Cell} from './cell';
 
 export class Field {
-  constructor(eng) {
-    this.colsCount = 10;
+  constructor(eng, colsCount) {
+    this.colsCount = colsCount;
     this.cellSize = eng.width / this.colsCount;
     this.rowsCount = eng.height / this.cellSize;
 
@@ -21,8 +21,13 @@ export class Field {
       cols.push(row);
     }
 
-    this.cols = cols;
+    this.area = cols;
   }
+
+  colsCount;
+  cellSize;
+  rowsCount;
+  area;
 
   getRowsCount() {
     return this.rowsCount;
@@ -33,11 +38,11 @@ export class Field {
   }
 
   get(x, y) {
-    return this.cols[x][y];
+    return this.area[x][y];
   }
 
   getState(x, y) {
-    return this.cols[x][y].state;
+    return this.area[x][y].state;
   }
 
   getRawField() {
@@ -47,16 +52,24 @@ export class Field {
   clearRow(y) {
     if (y >= 0 && y < this.rowsCount)
       for (let x = this.colsCount; x--;) {
-        this.cols[x][y].off();
+        this.area[x][y].off();
       }
+  }
+
+  clear() {
+    for (let y = this.rowsCount;  y--;) {
+      for (let x = this.colsCount; x--;) {
+        this.area[x][y].clear();
+      }
+    }
   }
 
   downShift(from_y) {
     for (let y = from_y; y > 0; y--) {
       for (let x = this.colsCount; x--;) {
-        this.cols[x][y].state = this.cols[x][y - 1].state;
-        this.cols[x][y].obj.color = this.cols[x][y - 1].obj.color;
-        this.cols[x][y - 1].off();
+        this.area[x][y].state = this.area[x][y - 1].state;
+        this.area[x][y].obj.color = this.area[x][y - 1].obj.color;
+        this.area[x][y - 1].off();
       }
     }
   }
