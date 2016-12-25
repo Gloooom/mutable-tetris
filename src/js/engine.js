@@ -115,10 +115,7 @@ export class Engine {
       this.keyEvents[key] = {};
     }
 
-    this.keyEvents[key][event] = () => {
-      fn();
-      console.log(key, event);
-    }
+    this.keyEvents[key][event] = fn;
   }
 
   setCanvas(canvas) {
