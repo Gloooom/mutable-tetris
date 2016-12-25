@@ -1,4 +1,3 @@
-
 class GObj {
   constructor(color, x, y, width, height) {
     this.color = color;
@@ -27,13 +26,9 @@ export class Engine {
     const checkKeyEvent = (event, state) => {
       let key = this.getKeyCode(event);
 
-      if (key in this.downKeys && state === 'up') {
-        this.downKeys.splice(key, 1);
-      } else {
-        this.downKeys[key] = true;
-      }
+      this.pressedKeys[key] = state !== 'up';
 
-      if (this.keyEvents.hasOwnProperty(key) && this.keyEvents[key].hasOwnProperty(state)) {
+      if (this.keyEvents[key] && this.keyEvents[key][state]) {
         this.keyEvents[key][state]();
       }
     };
@@ -45,17 +40,18 @@ export class Engine {
   width = 0;
   height = 0;
   objectsForDelete = [];
-  downKeys = [];
+  pressedKeys = {};
   objects = [];
   startFrameTime;
   frameDeltaTime;
   canvas;
-  frame = () => {};
+  frame = () => {
+  };
   intervalID;
   inAction = false;
   keyEvents = {};
   timeout = 1000 / 50;
-  
+
   overlay = document.getElementById('overlay');
   overlayText = document.getElementById('overlay-text');
 
@@ -66,10 +62,8 @@ export class Engine {
     if (!this.inAction) {
       clearInterval(this.intervalID);
     } else {
-      for (let key in this.downKeys) {
-        if (this.downKeys.hasOwnProperty(key)
-          && this.keyEvents.hasOwnProperty(key)
-          && this.keyEvents[key].hasOwnProperty("press")) {
+      for (let key in this.pressedKeys) {
+        if (this.pressedKeys[key] && this.keyEvents[key] && this.keyEvents[key]["press"]) {
           this.keyEvents[key]["press"]();
         }
       }
@@ -90,7 +84,7 @@ export class Engine {
       this.drawAll();
     }
   };
-  
+
   getTime() {
     let date = new Date();
     return date.getMilliseconds() + date.getSeconds() * 1000;
@@ -121,7 +115,10 @@ export class Engine {
       this.keyEvents[key] = {};
     }
 
-    this.keyEvents[key][event] = fn;
+    this.keyEvents[key][event] = () => {
+      fn();
+      console.log(key, event);
+    }
   }
 
   setCanvas(canvas) {
@@ -135,14 +132,14 @@ export class Engine {
   }
 
   getPressKeys() {
-    return this.downKeys.slice();
+    return this.pressedKeys.slice();
   }
 
   createObj(color, x, y, width, height) {
     let obj = new GObj(color, x, y, width, height);
-    
+
     this.objects.push(obj);
-    
+
     return obj;
   }
 
@@ -171,12 +168,12 @@ export class Engine {
   clear() {
     this.canvas.clearRect(0, 0, this.width, this.height);
   }
-  
+
   showOverlay(text) {
     this.overlay.classList.remove('hidden');
     this.overlayText.innerHTML = text;
   }
-  
+
   hideOverlay() {
     this.overlay.classList.add('hidden');
   }
