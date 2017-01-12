@@ -14,6 +14,8 @@ export class Tetris {
     this.engine.setFrameFunc((delta) => this.frameFunction(delta));
 
     this.stats = new Stats();
+
+    this.addKeyEvents();
   }
 
   activeFigure;
@@ -22,6 +24,56 @@ export class Tetris {
   loss = false;
   step = false;
   score = 0;
+
+  addKeyEvents() {
+    this.engine.setKeyEvent("83", "press", () => {
+      this.activeFigure.action("move", 0, 1);
+    });
+
+    this.engine.setKeyEvent("65", "press", () => {
+      if (!this.step) {
+        this.activeFigure.action("move", -1, 0);
+        this.step = true;
+      }
+    });
+
+    this.engine.setKeyEvent("68", "press", () => {
+      if (!this.step) {
+        this.activeFigure.action("move", 1, 0);
+        this.step = true;
+      }
+    });
+
+    this.engine.setKeyEvent("32", "down", () => {
+      this.activeFigure.action("rotate");
+    });
+
+    this.engine.setKeyEvent("87", "down", () => {
+      if (!this.step) {
+        this.activeFigure.action("fall");
+        this.step = true;
+      }
+    });
+
+    this.engine.setKeyEvent("81", "up", () => {
+      if (!this.loss) {
+        if (this.engine.inAction) {
+          this.engine.stop();
+          this.engine.showOverlay('PAUSE');
+          this.stats.stopTimer();
+        } else {
+          this.engine.start();
+          this.engine.hideOverlay();
+          this.stats.startTimer();
+        }
+      }
+    });
+
+    this.engine.setKeyEvent("82", "up", () => {
+      this.reset();
+      this.step = true;
+    });
+  }
 
   checkThrow(fig) {
     let checkRows = [],
@@ -131,54 +183,6 @@ export class Tetris {
       Tetris.deltaTimeMove = 0;
       this.step = false;
     }
-
-    this.engine.setKeyEvent("83", "press", () => {
-      this.activeFigure.action("move", 0, 1);
-    });
-
-    this.engine.setKeyEvent("65", "press", () => {
-      if (!this.step) {
-        this.activeFigure.action("move", -1, 0);
-        this.step = true;
-      }
-    });
-
-    this.engine.setKeyEvent("68", "press", () => {
-      if (!this.step) {
-        this.activeFigure.action("move", 1, 0);
-        this.step = true;
-      }
-    });
-
-    this.engine.setKeyEvent("32", "down", () => {
-      this.activeFigure.action("rotate");
-    });
-
-    this.engine.setKeyEvent("87", "down", () => {
-      if (!this.step) {
-        this.activeFigure.action("fall");
-        this.step = true;
-      }
-    });
-
-    this.engine.setKeyEvent("81", "up", () => {
-      if (!this.loss) {
-        if (this.engine.inAction) {
-          this.engine.stop();
-          this.engine.showOverlay('PAUSE');
-          this.stats.stopTimer();
-        } else {
-          this.engine.start();
-          this.engine.hideOverlay();
-          this.stats.startTimer();
-        }
-      }
-    });
-
-    this.engine.setKeyEvent("82", "up", () => {
-      this.reset();
-      this.step = true;
-    });
 
     return true;
   }
