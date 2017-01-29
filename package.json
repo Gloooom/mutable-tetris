@@ -1,5 +1,5 @@
 {
-  "name": "mutable-tetris",
+  "name": "simple-tetris",
   "version": "1.0.0",
   "description": "tetris with mutable blocks",
   "main": "main.js",

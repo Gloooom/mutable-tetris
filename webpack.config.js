@@ -9,7 +9,7 @@ console.log(isProd ? 'Production build' : 'Development build');
 
 const plugins = [
   new HtmlWebpackPlugin({
-    title: 'Mutable Tetris',
+    title: 'Simple Tetris',
     template: 'src/index.html',
     inject: 'body'
   })
