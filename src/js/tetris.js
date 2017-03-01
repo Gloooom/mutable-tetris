@@ -25,6 +25,9 @@ export class Tetris {
   step = false;
   score = 0;
 
+  deltaTimeFall = 0;
+  deltaTimeMove = 0;
+
   addKeyEvents() {
     this.engine.setKeyEvent("83", "press", () => {
       this.activeFigure.action("move", 0, 1);
@@ -158,29 +161,29 @@ export class Tetris {
 
     this.activeFigure.draw();
 
-    if (!Tetris.deltaTimeFall) {
-      Tetris.deltaTimeFall = 0;
+    if (!this.deltaTimeFall) {
+      this.deltaTimeFall = 0;
     }
 
-    if (!Tetris.deltaTimeMove) {
-      Tetris.deltaTimeMove = 0;
+    if (!this.deltaTimeMove) {
+      this.deltaTimeMove = 0;
     }
 
-    if (Tetris.deltaTimeFall < 0) {//<----WTF???
-      Tetris.deltaTimeFall = 0;
-      Tetris.deltaTimeMove = 0;
+    if (this.deltaTimeFall < 0) {//<----WTF???
+      this.deltaTimeFall = 0;
+      this.deltaTimeMove = 0;
     }
 
-    Tetris.deltaTimeFall += delta;
-    Tetris.deltaTimeMove += delta;
+    this.deltaTimeFall += delta;
+    this.deltaTimeMove += delta;
 
-    if (Tetris.deltaTimeFall >= 400) {
-      Tetris.deltaTimeFall = 0;
+    if (this.deltaTimeFall >= 400) {
+      this.deltaTimeFall = 0;
       this.activeFigure.action("move", 0, 1);
     }
 
-    if (Tetris.deltaTimeMove >= 200) {
-      Tetris.deltaTimeMove = 0;
+    if (this.deltaTimeMove >= 200) {
+      this.deltaTimeMove = 0;
       this.step = false;
     }
 
